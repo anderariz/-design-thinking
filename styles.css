@@ -76,3 +76,87 @@ dialog{border:0;padding:0;background:transparent;color:var(--text);width:min(920
   content:"Selecciona todos los que correspondan. Una aportación puede pertenecer a varios dominios.";
   flex-basis:100%;font-size:11px;color:#6f7a86;margin-bottom:3px;
 }
+
+
+/* V5 · navegación a aportaciones anteriores */
+.source-card-row{
+  grid-template-columns:22px minmax(0,1fr) auto;
+  align-items:start;
+}
+.source-card-content{
+  min-width:0;
+  line-height:1.35;
+}
+.source-goto{
+  align-self:center;
+  border:1px solid #2b617f;
+  background:#0d2636;
+  color:#74c9ff;
+  border-radius:8px;
+  padding:7px 9px;
+  font-size:11px;
+  font-weight:800;
+  white-space:nowrap;
+}
+.source-goto:active{transform:scale(.97)}
+.card-focus{
+  outline:2px solid var(--blue);
+  box-shadow:0 0 0 5px rgba(0,138,243,.13),0 18px 45px rgba(0,0,0,.28);
+  animation:focusPulse 1.2s ease-in-out 2;
+}
+@keyframes focusPulse{
+  0%,100%{transform:scale(1)}
+  50%{transform:scale(1.015)}
+}
+@media(max-width:560px){
+  .source-card-row{
+    grid-template-columns:22px minmax(0,1fr);
+  }
+  .source-goto{
+    grid-column:2;
+    justify-self:start;
+    margin-top:3px;
+  }
+}
+
+
+/* V6 · búsqueda en aportaciones anteriores */
+.source-search-wrap{
+  position:relative;
+  margin-top:10px;
+}
+.source-search-wrap input{
+  padding-right:38px;
+  font-size:13px;
+}
+.clear-search{
+  position:absolute;
+  right:7px;
+  top:50%;
+  transform:translateY(-50%);
+  width:28px;
+  height:28px;
+  border:0;
+  border-radius:7px;
+  background:#1b222a;
+  color:#aeb8c2;
+  font-size:18px;
+  line-height:1;
+}
+.source-search-count{
+  margin-top:6px;
+  font-size:10px;
+  color:#697581;
+}
+.source-cluster{
+  color:#83909c;
+  font-weight:500;
+}
+.source-empty-search{
+  padding:16px 10px;
+  text-align:center;
+  color:#7e8994;
+  font-size:12px;
+  border:1px dashed #29313a;
+  border-radius:10px;
+}

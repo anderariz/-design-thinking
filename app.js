@@ -151,7 +151,7 @@ const MIRO_CONTRIBUTIONS = [
 }));
 
 const DEMO = {
-  schemaVersion:4,
+  schemaVersion:6,
   projectName:"Eficiencia en la Oficina Técnica",
   currentPhase:"empathize",
   roles:DEFAULT_ROLES,
@@ -159,12 +159,13 @@ const DEMO = {
   contributions:MIRO_CONTRIBUTIONS
 };
 
-const STORAGE_KEY="design-thinking-v4";
-const OLD_KEYS=["design-thinking-v3","design-thinking-v2","bk-design-thinking-v1"];
+const STORAGE_KEY="design-thinking-v6";
+const OLD_KEYS=["design-thinking-v5","design-thinking-v4","design-thinking-v3","design-thinking-v2","bk-design-thinking-v1"];
 let state=loadState();
 let currentView="cards";
 let selectedSources=new Set();
 let selectedTopics=new Set();
+let pendingFocusId=null;
 
 const $=s=>document.querySelector(s);
 const phase=()=>PHASES.find(p=>p.id===state.currentPhase);
@@ -199,7 +200,7 @@ function migrate(data){
   // V4 ALWAYS merges the current catalogue and Miro seed data.
   // User-created content is preserved; missing V4 data is injected.
   const s={
-    schemaVersion:4,
+    schemaVersion:6,
     projectName:data.projectName||DEMO.projectName,
     currentPhase:data.currentPhase||"empathize",
     roles:Array.isArray(data.roles)&&data.roles.length?data.roles:clone(DEFAULT_ROLES),
@@ -230,7 +231,7 @@ function render(){
 }
 function renderPhases(){
   $("#phaseNav").innerHTML=PHASES.map((p,i)=>`<button class="phase-link ${p.id===state.currentPhase?"active":""}" data-phase="${p.id}"><span class="phase-num">${i+1}</span><span>${p.name}</span></button>`).join("");
-  document.querySelectorAll(".phase-link").forEach(b=>b.onclick=()=>{state.currentPhase=b.dataset.phase;selectedSources.clear();selectedTopics.clear();saveState();render();});
+  document.querySelectorAll(".phase-link").forEach(b=>b.onclick=()=>{state.currentPhase=b.dataset.phase;selectedSources.clear();selectedTopics.clear();if($("#sourceSearchInput"))$("#sourceSearchInput").value="";saveState();render();});
 }
 function renderRoles(){
   const available=state.roles.filter(r=>r.phases.includes(state.currentPhase));
@@ -257,14 +258,97 @@ function previousContributions(){
   const idx=PHASES.findIndex(p=>p.id===state.currentPhase),allowed=new Set(PHASES.slice(0,idx).map(p=>p.id));
   return state.contributions.filter(c=>allowed.has(c.phase));
 }
+function getFilteredPreviousContributions(){
+  const items=previousContributions();
+  const q=($("#sourceSearchInput")?.value||"").trim().toLowerCase();
+
+  if(!q)return items;
+
+  return items.filter(c=>{
+    const phaseName=PHASES.find(p=>p.id===c.phase)?.name||"";
+    const topics=(c.topicIds||[]).map(topicName).join(" ");
+    const haystack=[
+      c.text||"",
+      c.author||"",
+      roleName(c.role)||"",
+      c.cluster||"",
+      phaseName,
+      topics
+    ].join(" ").toLowerCase();
+
+    return haystack.includes(q);
+  });
+}
+
 function renderSources(){
   const area=$("#sourceArea");
   if(!phase().sources){area.classList.add("hidden");return;}
   area.classList.remove("hidden");
-  const items=previousContributions();
-  $("#sourceSuggestions").innerHTML=items.length?items.map(c=>`<label class="source-card"><input type="checkbox" data-source="${c.id}" ${selectedSources.has(c.id)?"checked":""}><span><strong>${PHASES.find(p=>p.id===c.phase)?.name}</strong> · ${topicListText(c)}<br>${escapeHtml(c.text)}</span></label>`).join(""):'<div class="muted">No hay aportaciones anteriores todavía.</div>';
-  document.querySelectorAll("[data-source]").forEach(x=>x.onchange=()=>x.checked?selectedSources.add(x.dataset.source):selectedSources.delete(x.dataset.source));
+
+  const all=previousContributions();
+  const items=getFilteredPreviousContributions();
+  const q=($("#sourceSearchInput")?.value||"").trim();
+
+  const clearBtn=$("#clearSourceSearchBtn");
+  if(clearBtn)clearBtn.classList.toggle("hidden",!q);
+
+  const count=$("#sourceSearchCount");
+  if(count){
+    count.textContent=q
+      ? `${items.length} de ${all.length} aportaciones`
+      : `${all.length} aportaciones disponibles`;
+  }
+
+  $("#sourceSuggestions").innerHTML=items.length?items.map(c=>`
+    <div class="source-card source-card-row">
+      <input type="checkbox" data-source="${c.id}" ${selectedSources.has(c.id)?"checked":""}>
+      <div class="source-card-content">
+        <strong>${PHASES.find(p=>p.id===c.phase)?.name}</strong> · ${topicListText(c)}
+        ${c.cluster?`<span class="source-cluster"> · ${escapeHtml(c.cluster)}</span>`:""}
+        <br>${escapeHtml(c.text)}
+      </div>
+      <button type="button" class="source-goto" data-goto="${c.id}" aria-label="Ir a la aportación">Ver →</button>
+    </div>`).join("")
+    : `<div class="source-empty-search">${q?"No hay aportaciones que coincidan con la búsqueda.":"No hay aportaciones anteriores todavía."}</div>`;
+
+  document.querySelectorAll("[data-source]").forEach(x=>{
+    x.onchange=()=>x.checked?selectedSources.add(x.dataset.source):selectedSources.delete(x.dataset.source);
+  });
+
+  document.querySelectorAll("[data-goto]").forEach(b=>{
+    b.onclick=()=>goToContribution(b.dataset.goto);
+  });
 }
+
+function goToContribution(id){
+  const c=state.contributions.find(x=>x.id===id);
+  if(!c)return;
+
+  pendingFocusId=id;
+  state.currentPhase=c.phase;
+  selectedSources.clear();
+  selectedTopics.clear();
+
+  $("#searchInput").value="";
+  $("#filterRole").value="";
+  $("#filterTopic").value="";
+
+  saveState();
+  render();
+
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{
+      const card=document.querySelector(`[data-contribution-id="${id}"]`);
+      if(card){
+        card.scrollIntoView({behavior:"smooth",block:"center"});
+        card.classList.add("card-focus");
+        setTimeout(()=>card.classList.remove("card-focus"),3000);
+      }
+      pendingFocusId=null;
+    });
+  });
+}
+
 function renderTopicPicker(){
   $("#topicPicker").innerHTML=state.topics.map(t=>`<button type="button" class="topic-option ${selectedTopics.has(t.id)?"selected":""}" data-topic-pick="${t.id}"><span class="check">✓</span>${escapeHtml(t.name)}</button>`).join("");
   document.querySelectorAll("[data-topic-pick]").forEach(b=>b.onclick=()=>{selectedTopics.has(b.dataset.topicPick)?selectedTopics.delete(b.dataset.topicPick):selectedTopics.add(b.dataset.topicPick);renderTopicPicker();});
@@ -312,7 +396,7 @@ function cardHtml(c){
   const cluster=c.cluster?`<span class="cluster-badge">${escapeHtml(c.cluster)}</span>`:"";
   const origin=c.origin==="miro"?`<span class="origin-badge">MIRO</span>`:"";
   const src=c.sourceIds?.length?`<div class="card-source">↳ Parte de ${c.sourceIds.length} aportación${c.sourceIds.length>1?"es":""} anterior${c.sourceIds.length>1?"es":""}</div>`:"";
-  return `<article class="card"><div class="card-top"><div>${cluster}${origin}</div><span class="priority ${c.priority}"></span></div>${topics?`<div class="topic-tags">${topics}</div>`:""}<div class="card-text">${escapeHtml(c.text)}</div>${src}<div class="card-meta"><span>${escapeHtml(c.author)} · ${escapeHtml(roleName(c.role))}</span><span>${new Date(c.createdAt).toLocaleDateString("es-ES")}</span></div></article>`;
+  return `<article class="card ${pendingFocusId===c.id?"card-focus":""}" data-contribution-id="${c.id}"><div class="card-top"><div>${cluster}${origin}</div><span class="priority ${c.priority}"></span></div>${topics?`<div class="topic-tags">${topics}</div>`:""}<div class="card-text">${escapeHtml(c.text)}</div>${src}<div class="card-meta"><span>${escapeHtml(c.author)} · ${escapeHtml(roleName(c.role))}</span><span>${new Date(c.createdAt).toLocaleDateString("es-ES")}</span></div></article>`;
 }
 function escapeHtml(s=""){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));}
 
@@ -331,7 +415,7 @@ $("#saveContributionBtn").onclick=()=>{
 $("#projectName").onchange=e=>{state.projectName=e.target.value.trim()||"Proyecto sin nombre";saveState();}
 $("#searchInput").oninput=renderBoard;$("#filterRole").onchange=renderBoard;$("#filterTopic").onchange=renderBoard;
 document.querySelectorAll(".toggle").forEach(b=>b.onclick=()=>{currentView=b.dataset.view;document.querySelectorAll(".toggle").forEach(x=>x.classList.toggle("active",x===b));renderBoard();});
-$("#selectAllSourcesBtn").onclick=()=>{previousContributions().forEach(c=>selectedSources.add(c.id));renderSources();};
+$("#selectAllSourcesBtn").onclick=()=>{getFilteredPreviousContributions().forEach(c=>selectedSources.add(c.id));renderSources();};
 $("#newTopicBtn").onclick=()=>$("#topicDialog").showModal();
 $("#createTopicBtn").onclick=e=>{
   const name=$("#newTopicName").value.trim();if(!name){e.preventDefault();return;}
@@ -349,5 +433,17 @@ $("#resetBtn").onclick=()=>{if(confirm("¿Reiniciar los datos locales de la apli
 $("#exportBtn").onclick=()=>{const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="design-thinking.json";a.click();URL.revokeObjectURL(a.href);};
 $("#openSidebar").onclick=()=>$("#sidebar").classList.add("open");
 $("#closeSidebar").onclick=()=>$("#sidebar").classList.remove("open");
+
+
+if($("#sourceSearchInput")){
+  $("#sourceSearchInput").oninput=renderSources;
+}
+if($("#clearSourceSearchBtn")){
+  $("#clearSourceSearchBtn").onclick=()=>{
+    $("#sourceSearchInput").value="";
+    renderSources();
+    $("#sourceSearchInput").focus();
+  };
+}
 
 render();

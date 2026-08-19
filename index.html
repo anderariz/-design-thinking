@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <meta name="theme-color" content="#0b0d10" />
-  <title>Design Thinking · V4</title>
+  <title>Design Thinking · V6</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -88,6 +88,11 @@
               <span>Recuperar aportaciones anteriores</span>
               <button class="link-btn" id="selectAllSourcesBtn">Seleccionar visibles</button>
             </div>
+            <div class="source-search-wrap">
+              <input id="sourceSearchInput" type="search" placeholder="Buscar por texto, tema, cluster o autor..." />
+              <button type="button" class="clear-search hidden" id="clearSourceSearchBtn">×</button>
+            </div>
+            <div id="sourceSearchCount" class="source-search-count"></div>
             <div id="sourceSuggestions" class="source-suggestions"></div>
           </div>
 

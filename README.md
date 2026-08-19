@@ -1,42 +1,24 @@
-# Design Thinking · V4
+# Design Thinking · V6
 
-## Correcciones respecto a V3
+## Nuevo buscador en aportaciones anteriores
 
-### 1. Catálogo de temas
-V3 podía conservar únicamente los temas existentes en el `localStorage` del navegador.
-V4 **fusiona siempre** los temas base nuevos con los existentes, sin borrar los temas creados por el usuario.
+En las fases posteriores, el bloque **Recuperar aportaciones anteriores** incorpora un campo de búsqueda.
 
-Incluye dos niveles útiles como etiquetas:
-- Dominios de problema: Seguridad/Ergonomía, Máquinas/Mantenimiento, Método/Proceso,
-  Coste/Financiero, Materiales/Almacén, Personas/Organización,
-  Trazabilidad/Digitalización, Comercial/Oportunidad e Infraestructura/Espacio/Layout.
-- Temas técnicos transversales: CAD, PDM, Ofertas, Gestión de tareas, Alcance,
-  Comunicación, Know-how, Revisiones, Costes/Tiempos, Materiales/Tratamientos,
-  Fabricación/Montaje, Tolerancias, Máquinas/Medios, Automatización e Integraciones ERP.
+Busca simultáneamente en:
+- texto de la aportación;
+- tema/dominio;
+- área o cluster;
+- autor;
+- rol;
+- fase de origen.
 
-### 2. Contenido Miro
-Se incorporan decenas de aportaciones reconstruidas de las capturas facilitadas del tablero Miro.
-Las tarjetas importadas aparecen con la marca `MIRO`.
+El botón **Seleccionar visibles** actúa ahora solo sobre los resultados que aparecen tras aplicar la búsqueda.
 
-Áreas/cluster precargados:
-- CAD
-- PDM
-- Revisiones automatizadas
-- Alcance
-- Comunicación
-- Gestión de tareas / equipo
-- Generador de ofertas
-- Calculadora de costes y tiempos
-- Configurador de diseño adaptable
+Cada resultado mantiene el botón **Ver →** para navegar a la aportación original.
 
-### 3. Migración
-Al abrir V4:
-- conserva las aportaciones creadas por el usuario;
-- conserva temas personalizados;
-- añade los nuevos temas que falten;
-- añade las aportaciones Miro que falten;
-- no duplica elementos ya migrados gracias a IDs estables.
+V6 migra automáticamente los datos de V5, V4, V3, V2 y V1.
 
-## GitHub Pages
-Sustituye `index.html`, `styles.css` y `app.js` por los de esta versión.
-No debería ser necesario borrar datos del navegador.
+Para GitHub Pages sustituye:
+- `index.html`
+- `styles.css`
+- `app.js`
