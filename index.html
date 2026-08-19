@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#0b0d10" />
+  <title>BerriKide · Design Thinking</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div class="app-shell">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">BK</div>
+      <div>
+        <strong>BerriKide</strong>
+        <span>Design Thinking</span>
+      </div>
+    </div>
+    <div class="top-actions">
+      <button class="ghost" id="exportBtn">Exportar</button>
+      <button class="primary" id="newTopicBtn">+ Tema</button>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-head">
+        <span>PROYECTO</span>
+        <button class="icon-btn mobile-only" id="closeSidebar">×</button>
+      </div>
+      <input id="projectName" class="project-input" value="Nuevo reto BerriKide" />
+
+      <div class="section-label">FASES</div>
+      <nav id="phaseNav" class="phase-nav"></nav>
+
+      <div class="section-label">ROLES</div>
+      <div id="roleList" class="role-list"></div>
+      <button class="small-btn" id="manageRolesBtn">Gestionar roles</button>
+
+      <div class="sidebar-footer">
+        <button class="ghost full" id="resetBtn">Reiniciar demo</button>
+      </div>
+    </aside>
+
+    <section class="content">
+      <div class="mobile-toolbar">
+        <button class="icon-btn" id="openSidebar">☰</button>
+        <span id="mobilePhaseTitle">Empatizar</span>
+      </div>
+
+      <div class="phase-header">
+        <div>
+          <div class="eyebrow" id="phaseIndex">FASE 1 DE 5</div>
+          <h1 id="phaseTitle">Empatizar</h1>
+          <p id="phaseDescription"></p>
+        </div>
+        <div class="phase-progress" id="phaseProgress"></div>
+      </div>
+
+      <div class="layout-grid">
+        <section class="panel compose-panel">
+          <div class="panel-title-row">
+            <div>
+              <div class="eyebrow">NUEVA APORTACIÓN</div>
+              <h2 id="composeTitle">Añadir observación</h2>
+            </div>
+            <span class="pill" id="activeRolePill">Rol</span>
+          </div>
+
+          <label>Participante</label>
+          <div class="inline-fields">
+            <input id="authorInput" placeholder="Nombre" value="Ander" />
+            <select id="roleSelect"></select>
+          </div>
+
+          <label>Formato recomendado</label>
+          <div class="template-box">
+            <div id="templateText"></div>
+            <button class="link-btn" id="useTemplateBtn">Usar estructura</button>
+          </div>
+
+          <label>Tu aportación</label>
+          <textarea id="contributionInput" rows="6" placeholder="Escribe aquí..."></textarea>
+
+          <div id="sourceArea" class="source-area hidden">
+            <div class="source-title">
+              <span>Recuperar aportaciones anteriores</span>
+              <button class="link-btn" id="selectAllSourcesBtn">Seleccionar visibles</button>
+            </div>
+            <div id="sourceSuggestions" class="source-suggestions"></div>
+          </div>
+
+          <div class="form-row">
+            <div>
+              <label>Tema / grupo</label>
+              <input id="clusterInput" list="clustersList" placeholder="Ej. Ofertas, documentación..." />
+              <datalist id="clustersList"></datalist>
+            </div>
+            <div>
+              <label>Prioridad</label>
+              <select id="prioritySelect">
+                <option value="media">Media</option>
+                <option value="alta">Alta</option>
+                <option value="baja">Baja</option>
+              </select>
+            </div>
+          </div>
+
+          <button class="primary full" id="saveContributionBtn">Guardar aportación</button>
+        </section>
+
+        <section class="panel board-panel">
+          <div class="panel-title-row">
+            <div>
+              <div class="eyebrow">TABLERO</div>
+              <h2>Aportaciones de la fase</h2>
+            </div>
+            <div class="view-toggle">
+              <button class="toggle active" data-view="cards">Tarjetas</button>
+              <button class="toggle" data-view="clusters">Grupos</button>
+            </div>
+          </div>
+
+          <div class="filters">
+            <input id="searchInput" placeholder="Buscar aportaciones..." />
+            <select id="filterRole"><option value="">Todos los roles</option></select>
+          </div>
+
+          <div id="board" class="board"></div>
+          <div id="emptyState" class="empty-state hidden">
+            <strong>Aún no hay aportaciones</strong>
+            <span>Empieza utilizando el formato sugerido de esta fase.</span>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+</div>
+
+<dialog id="rolesDialog">
+  <form method="dialog" class="dialog-card">
+    <div class="dialog-head">
+      <div>
+        <div class="eyebrow">CONFIGURACIÓN</div>
+        <h2>Roles y participación</h2>
+      </div>
+      <button class="icon-btn" value="cancel">×</button>
+    </div>
+    <p class="muted">Define qué perfiles pueden aportar en cada fase.</p>
+    <div id="rolesMatrix"></div>
+    <div class="dialog-actions">
+      <button class="ghost" value="cancel">Cerrar</button>
+      <button class="primary" id="saveRolesBtn" value="default">Guardar</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="topicDialog">
+  <form method="dialog" class="dialog-card small-dialog">
+    <div class="dialog-head">
+      <div>
+        <div class="eyebrow">NUEVO TEMA</div>
+        <h2>Crear grupo temático</h2>
+      </div>
+      <button class="icon-btn" value="cancel">×</button>
+    </div>
+    <label>Nombre</label>
+    <input id="newTopicName" placeholder="Ej. Retrasos en ofertas" />
+    <label>Descripción</label>
+    <textarea id="newTopicDescription" rows="4" placeholder="¿Qué engloba este tema?"></textarea>
+    <div class="dialog-actions">
+      <button class="ghost" value="cancel">Cancelar</button>
+      <button class="primary" id="createTopicBtn" value="default">Crear tema</button>
+    </div>
+  </form>
+</dialog>
+
+<script src="app.js"></script>
+</body>
+</html>
