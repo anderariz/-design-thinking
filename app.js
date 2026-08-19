@@ -15,53 +15,152 @@ const DEFAULT_ROLES = [
 ];
 
 const TOPICS = [
-  ["t1","CAD / Diseño","Modelado, detalle, cambios, reutilización y criterios de diseño."],
-  ["t2","PDM / Documentación","Planos, versiones, búsqueda, codificación y liberación documental."],
+  // Dominios visibles en el tablero Miro
+  ["d1","Seguridad / Ergonomía","Riesgos, ergonomía, seguridad de operación y condiciones de trabajo."],
+  ["d2","Máquinas / Mantenimiento","Máquinas, capacidad de medios, fiabilidad, mantenimiento y disponibilidad."],
+  ["d3","Método / Proceso","Métodos de trabajo, secuencias, procedimientos, estandarización y flujo de proceso."],
+  ["d4","Coste / Financiero","Costes, precios, estimaciones económicas, rentabilidad y recursos financieros."],
+  ["d5","Materiales / Almacén","Materiales, materia prima, stock, almacén, tratamientos y aprovisionamiento."],
+  ["d6","Personas / Organización","Roles, carga, formación, coordinación, responsabilidad y organización."],
+  ["d7","Trazabilidad / Digitalización","Datos, versiones, trazabilidad, sistemas digitales, ERP/PDM y automatización."],
+  ["d8","Comercial / Oportunidad","Oferta, cliente, oportunidad, requisitos comerciales y respuesta al mercado."],
+  ["d9","Infraestructura / Espacio / Layout","Espacio, implantación, distribución, accesibilidad y medios físicos."],
+
+  // Temas técnicos/transversales del mapa
+  ["t1","CAD / Diseño","Modelado, detalle, cambios, rendimiento, reutilización y criterios de diseño."],
+  ["t2","PDM / Documentación","Planos, versiones, búsqueda, codificación, propiedades y liberación documental."],
   ["t3","Ofertas","Generación de ofertas, estimaciones, datos técnicos y tiempos de respuesta."],
-  ["t4","Gestión de tareas y equipo","Carga, prioridades, asignación, seguimiento y coordinación."],
+  ["t4","Gestión de tareas / Equipo","Carga, prioridades, asignación, seguimiento y coordinación."],
   ["t5","Alcance","Definición de requisitos, límites, cambios y expectativas del proyecto."],
-  ["t6","Colaboración","Intercambio de información entre cliente, comercial, ingeniería y fabricación."],
+  ["t6","Comunicación","Intercambio de información entre cliente, comercial, ingeniería, montaje y fabricación."],
   ["t7","Know-how / Reutilización","Localización de soluciones previas, estándares y conocimiento interno."],
-  ["t8","Revisión y calidad","Errores de plano, interferencias, comprobaciones y revisiones automáticas."],
-  ["t9","Costes","Coste de pieza, material, mecanizado, montaje y estimaciones."],
-  ["t10","Materiales","Selección, tablas, propiedades y alternativas de material."],
-  ["t11","Procesos de fabricación","Operaciones, secuencias, montaje, instalación y proceso productivo."],
-  ["t12","Tiempos","Tiempos estimados, históricos, mecanizado, montaje y dedicación."],
-  ["t13","Tolerancias","Criterios de tolerancia, ajustes y coherencia entre diseño y fabricación."],
-  ["t14","Máquinas y medios","Capacidades de máquina, datos de proceso, recursos y restricciones."],
-  ["t15","Automatización","Reglas, asistentes, generación automática y eliminación de tareas repetitivas."]
+  ["t8","Revisión / Calidad","Errores de plano, interferencias, comprobaciones y revisiones."],
+  ["t9","Costes / Tiempos","Coste de pieza, material, mecanizado, montaje, tiempos y estimaciones."],
+  ["t10","Materiales / Tratamientos","Selección de material, tratamientos, propiedades y alternativas."],
+  ["t11","Fabricación / Montaje","Operaciones, secuencias, montaje, instalación y proceso productivo."],
+  ["t12","Tolerancias / Ajustes","Tolerancias, ajustes, función y coherencia con fabricación."],
+  ["t13","Máquinas / Medios","Capacidades de máquina, datos de proceso, recursos y restricciones."],
+  ["t14","Automatización / Asistentes","Reglas, asistentes, generación automática y eliminación de tareas repetitivas."],
+  ["t15","ERP / Integraciones","Relación CAD-PDM-ERP, exportaciones, actualizaciones e intercambio entre sistemas."]
 ].map(([id,name,description])=>({id,name,description}));
 
 const now = Date.now();
+
+/*
+  Aportaciones base reconstruidas del tablero Miro facilitado por el usuario.
+  Cuando un texto pequeño no era totalmente legible se ha conservado únicamente
+  la idea que sí puede leerse con seguridad, sin inventar una cita literal.
+*/
+const MIRO_CONTRIBUTIONS = [
+  // CAD
+  {id:"miro-cad-01",cluster:"CAD",topicIds:["t1","d3"],priority:"alta",text:"Falta cultura de dibujar a detalle."},
+  {id:"miro-cad-02",cluster:"CAD",topicIds:["t1","d3"],priority:"media",text:"Dibujar el diseño da reparo."},
+  {id:"miro-cad-03",cluster:"CAD",topicIds:["t1","t15","d7"],priority:"alta",text:"El CAD eléctrico y el CAD mecánico no están integrados."},
+  {id:"miro-cad-04",cluster:"CAD",topicIds:["t1","d2"],priority:"media",text:"No dibujar todo porque los ordenadores se colapsan."},
+  {id:"miro-cad-05",cluster:"CAD",topicIds:["t1","t2","d7"],priority:"alta",text:"Te cambian el 3D y te han matao."},
+  {id:"miro-cad-06",cluster:"CAD",topicIds:["t1","d3"],priority:"alta",text:"Dificultad para seleccionar entidades."},
+  {id:"miro-cad-07",cluster:"CAD",topicIds:["t1","d2"],priority:"alta",text:"No se pueden manejar con agilidad determinados modelos o piezas muy pesadas."},
+  {id:"miro-cad-08",cluster:"CAD",topicIds:["t1","d3"],priority:"media",text:"Dificultad para hacer pequeñas animaciones."},
+  {id:"miro-cad-09",cluster:"CAD",topicIds:["t1","d3"],priority:"media",text:"No se pueden hacer ecuaciones."},
+  {id:"miro-cad-10",cluster:"CAD",topicIds:["t1","d2"],priority:"alta",text:"Cuando la memoria se llena, el PC se bloquea."},
+  {id:"miro-cad-11",cluster:"CAD",topicIds:["t1","t2","d7"],priority:"alta",text:"Pérdida importante de enlaces al cambiar los 3D."},
+  {id:"miro-cad-12",cluster:"CAD",topicIds:["t1","t2","d7"],priority:"alta",text:"Problemas de conversión de archivos."},
+  {id:"miro-cad-13",cluster:"CAD",topicIds:["t1","t14","d7"],priority:"media",text:"No hay asistentes de cálculo."},
+  {id:"miro-cad-14",cluster:"CAD",topicIds:["t1","d7"],priority:"media",text:"Los esquemas neumáticos y los dibujos 3D son dos cosas independientes."},
+
+  // PDM / documentación
+  {id:"miro-pdm-01",cluster:"PDM",topicIds:["t2","t15","d7"],priority:"media",text:"Exportar y mantener actualizados PDF y DXF no aporta valor y consume tiempo."},
+  {id:"miro-pdm-02",cluster:"PDM",topicIds:["t2","d7"],priority:"alta",text:"El servidor está lleno de información y da miedo limpiar por si se elimina algo necesario."},
+  {id:"miro-pdm-03",cluster:"PDM",topicIds:["t2","t7","d7"],priority:"alta",text:"Hay que prestar mucha atención a que el diseño no tire de referencias de otros proyectos."},
+  {id:"miro-pdm-04",cluster:"PDM",topicIds:["t2","t7","d7"],priority:"alta",text:"Solo con experiencia o haciendo arqueología de datos se puede saber qué información reutilizar."},
+  {id:"miro-pdm-05",cluster:"PDM",topicIds:["t2","d7","d6"],priority:"alta",text:"¿Cómo sé quién ha modificado por última vez el archivo?"},
+  {id:"miro-pdm-06",cluster:"PDM",topicIds:["t2","d3","d7"],priority:"media",text:"Cumplimentar campos en el CAD es lento y no existe suficiente control."},
+  {id:"miro-pdm-07",cluster:"PDM",topicIds:["t2","d7"],priority:"alta",text:"Los ítems pueden arrastrar propiedades que no les corresponden por efecto de una copia inicial."},
+  {id:"miro-pdm-08",cluster:"PDM",topicIds:["t2","t15","d7"],priority:"alta",text:"Se lanza un diseño al ERP y después se descubre que falta un dato o que no es correcto."},
+  {id:"miro-pdm-09",cluster:"PDM",topicIds:["t2","d7","d3"],priority:"alta",text:"Se ha fabricado una pieza en una versión anterior."},
+  {id:"miro-pdm-10",cluster:"PDM",topicIds:["t2","t7","d7"],priority:"alta",text:"Necesitamos saber dónde se utiliza o se utilizó un ítem."},
+  {id:"miro-pdm-11",cluster:"PDM",topicIds:["t2","d7"],priority:"alta",text:"Se mezclan productos y el problema puede descubrirse al lanzar el diseño."},
+  {id:"miro-pdm-12",cluster:"PDM",topicIds:["t1","t2","t15","d7"],priority:"alta",text:"No siempre sabemos qué está manejando el proyecto eléctrico dentro del diseño mecánico."},
+  {id:"miro-pdm-13",cluster:"PDM",topicIds:["t2","d6"],priority:"media",text:"Una persona es dueña del diseño hasta que cierra el ensamblaje."},
+  {id:"miro-pdm-14",cluster:"PDM",topicIds:["t2","d7"],priority:"media",text:"Las codificaciones no son regulares y pueden variar en guiones, espacios u otros detalles."},
+  {id:"miro-pdm-15",cluster:"PDM",topicIds:["t2","d7"],priority:"media",text:"Un mismo componente puede aparecer varias veces."},
+
+  // Revisiones
+  {id:"miro-rev-01",cluster:"Revisiones automatizadas",topicIds:["t8","t12","d3"],priority:"alta",text:"Casi todos los planos tienen defectos."},
+  {id:"miro-rev-02",cluster:"Revisiones automatizadas",topicIds:["t8","t12","d3"],priority:"alta",text:"Una longitud de roscado puede no ser adecuada: demasiado poca o excesiva."},
+  {id:"miro-rev-03",cluster:"Revisiones automatizadas",topicIds:["t8","t12","d3"],priority:"media",text:"Hay métricas que no son coherentes con la función: por ejemplo, rosca, inserto o agujero pasante."},
+  {id:"miro-rev-04",cluster:"Revisiones automatizadas",topicIds:["t8","t1","d3"],priority:"media",text:"Interpretar un análisis de interferencias es difícil."},
+  {id:"miro-rev-05",cluster:"Revisiones automatizadas",topicIds:["t8","d6","d3"],priority:"alta",text:"Revisar puede resultar interminable y depende mucho de la atención de la persona."},
+  {id:"miro-rev-06",cluster:"Revisiones automatizadas",topicIds:["t8","d6"],priority:"alta",text:"Hay pocas horas para revisar y demasiados elementos que comprobar."},
+
+  // Alcance y comunicación
+  {id:"miro-alc-01",cluster:"Alcance",topicIds:["t5","t6","d6"],priority:"alta",text:"No sabes que tienes una reunión dentro de 10 minutos."},
+  {id:"miro-alc-02",cluster:"Alcance",topicIds:["t5","t6","d7"],priority:"alta",text:"Un mail, llamada, WhatsApp, reunión o videollamada puede dejar fuera a alguien porque no estaba en copia."},
+  {id:"miro-alc-03",cluster:"Alcance",topicIds:["t5","t6","d6"],priority:"alta",text:"Dos personas leen el mismo pliego y pueden encontrar o interpretar cosas diferentes."},
+  {id:"miro-alc-04",cluster:"Alcance",topicIds:["t5","t6","d8"],priority:"alta",text:"La planificación cambia cuando aparecen nuevas versiones, cambios del cliente o información que llega tarde."},
+  {id:"miro-com-01",cluster:"Comunicación",topicIds:["t6","d6","d7"],priority:"media",text:"Las consultas se hacen de palabra y luego cuesta recuperar qué se decidió."},
+  {id:"miro-com-02",cluster:"Comunicación",topicIds:["t6","d6","d7"],priority:"media",text:"Tu compañero no quiere ponerse la app en el móvil."},
+  {id:"miro-com-03",cluster:"Comunicación",topicIds:["t6","d6"],priority:"media",text:"Compartir y solicitar datos a proveedores o compañeros genera esperas cuando no hay un canal claro."},
+
+  // Gestión de tareas / equipo
+  {id:"miro-task-01",cluster:"Gestión de tareas / equipo",topicIds:["t4","t6","d6"],priority:"alta",text:"El cliente no está disponible y el equipo se queda parado."},
+  {id:"miro-task-02",cluster:"Gestión de tareas / equipo",topicIds:["t4","t8","d6"],priority:"alta",text:"Se quedan cosas atascadas esperando una revisión."},
+  {id:"miro-task-03",cluster:"Gestión de tareas / equipo",topicIds:["t4","d6"],priority:"alta",text:"¡Y todo esto para el viernes!"},
+  {id:"miro-task-04",cluster:"Gestión de tareas / equipo",topicIds:["t4","d6"],priority:"media",text:"Se reparten tareas al inicio de la semana, pero las prioridades cambian y el reparto deja de representar la realidad."},
+  {id:"miro-task-05",cluster:"Gestión de tareas / equipo",topicIds:["t4","d6"],priority:"media",text:"Dictar las tareas a cada individuo delante de todos no significa necesariamente que exista trabajo en equipo."},
+  {id:"miro-task-06",cluster:"Gestión de tareas / equipo",topicIds:["t4","t6","d6"],priority:"alta",text:"El montador entra en la oficina solicitando asistencia inmediata porque necesita resolver una incidencia."},
+  {id:"miro-task-07",cluster:"Gestión de tareas / equipo",topicIds:["t4","d6"],priority:"media",text:"Según quién opere, el despiece puede tener un criterio diferente."},
+  {id:"miro-task-08",cluster:"Gestión de tareas / equipo",topicIds:["t4","d6","d3"],priority:"media",text:"La incorporación de una nueva persona implica formación y acompañamiento."},
+  {id:"miro-task-09",cluster:"Gestión de tareas / equipo",topicIds:["t4","d6"],priority:"alta",text:"Se da por supuesto que una persona ya sabe determinadas cosas porque 'eso es de la escuela'."},
+  {id:"miro-task-10",cluster:"Gestión de tareas / equipo",topicIds:["t4","t12","d6","d3"],priority:"media",text:"Se discute por la selección de un sensor."},
+  {id:"miro-task-11",cluster:"Gestión de tareas / equipo",topicIds:["t4","t1","d6","d3"],priority:"media",text:"No hay un procedimiento común de delineación ni de modelado 3D."},
+  {id:"miro-task-12",cluster:"Gestión de tareas / equipo",topicIds:["t4","d6","d3"],priority:"media",text:"Se discute por la selección de una óptica o cámara."},
+
+  // Generador de ofertas
+  {id:"miro-ofe-01",cluster:"Generador de ofertas",topicIds:["t3","d8","d4"],priority:"alta",text:"Hay mucho lanzamiento de bobina y trabajos similares que podrían aprovechar conocimiento anterior."},
+  {id:"miro-ofe-02",cluster:"Generador de ofertas",topicIds:["t3","t7","d8","d7"],priority:"alta",text:"Se vende confianza y compromiso, pero no siempre existe un modelo claro para reutilizar datos de ofertas anteriores."},
+  {id:"miro-ofe-03",cluster:"Generador de ofertas",topicIds:["t3","d8","d4"],priority:"alta",text:"No tenemos nada estándar ni ladrillos de oro para construir una oferta rápidamente."},
+  {id:"miro-ofe-04",cluster:"Generador de ofertas",topicIds:["t3","t1","d8"],priority:"alta",text:"El cliente necesita compartir el modelo con su equipo."},
+  {id:"miro-ofe-05",cluster:"Generador de ofertas",topicIds:["t3","d8","d4"],priority:"alta",text:"Se empieza a ofertar y faltan datos."},
+
+  // Costes / tiempos / materiales / fabricación
+  {id:"miro-cost-01",cluster:"Calculadora de costes y tiempos",topicIds:["t9","d4"],priority:"alta",text:"El precio puede variar mucho."},
+  {id:"miro-cost-02",cluster:"Calculadora de costes y tiempos",topicIds:["t9","t11","d4","d3"],priority:"alta",text:"Estimar tiempos de ciclo es un compromiso y a menudo se basa en vídeos, experiencia o sensaciones."},
+  {id:"miro-cost-03",cluster:"Calculadora de costes y tiempos",topicIds:["t9","d4"],priority:"alta",text:"Cuando te dicen el precio final de la pieza, te asustas."},
+  {id:"miro-cost-04",cluster:"Calculadora de costes y tiempos",topicIds:["t9","t10","t11","d4","d5"],priority:"alta",text:"Para sacar el coste de un conjunto hay que combinar material, geometría, operaciones, montaje e instalación."},
+
+  // Flujo funcional de calculadora observado en el Miro
+  {id:"miro-flow-01",cluster:"Calculadora de costes y tiempos",topicIds:["t9","t10","d5"],priority:"media",text:"Proponer material y tratamiento a partir de la función de la pieza."},
+  {id:"miro-flow-02",cluster:"Calculadora de costes y tiempos",topicIds:["t9","t10","d5","d4"],priority:"media",text:"Calcular el tamaño de la materia prima."},
+  {id:"miro-flow-03",cluster:"Calculadora de costes y tiempos",topicIds:["t9","t11","d3"],priority:"media",text:"Detectar la forma de la pieza."},
+  {id:"miro-flow-04",cluster:"Calculadora de costes y tiempos",topicIds:["t9","t10","d5"],priority:"media",text:"Proponer el tamaño de materia prima."},
+  {id:"miro-flow-05",cluster:"Calculadora de costes y tiempos",topicIds:["t9","t11","d4","d5"],priority:"media",text:"Calcular el material a eliminar."},
+  {id:"miro-flow-06",cluster:"Calculadora de costes y tiempos",topicIds:["t9","t11","t13","d2","d4"],priority:"alta",text:"Calcular un tiempo y coste estimado de fabricación."},
+  {id:"miro-flow-07",cluster:"Calculadora de costes y tiempos",topicIds:["t10","d5"],priority:"media",text:"Mantener una tabla de materiales de usuario y tablas de demasías según material."},
+  {id:"miro-flow-08",cluster:"Calculadora de costes y tiempos",topicIds:["t9","t11","t13","d2","d4"],priority:"media",text:"Mantener tablas de tiempos genéricos de arranque de material y cuotas horarias de máquinas."},
+  {id:"miro-flow-09",cluster:"Configurador de diseño adaptable",topicIds:["t12","t11","d3"],priority:"media",text:"Introducir el tipo de tolerancia deseada y proponer una tolerancia adecuada."},
+  {id:"miro-flow-10",cluster:"Configurador de diseño adaptable",topicIds:["t9","t11","d4"],priority:"media",text:"Calcular el trabajo de montaje e instalación."}
+].map((c,i)=>({
+  ...c,
+  phase:"empathize",
+  author:"Miro",
+  role:"tecnico",
+  sourceIds:[],
+  origin:"miro",
+  createdAt:now-500000+i*1000
+}));
+
 const DEMO = {
-  schemaVersion:3,
+  schemaVersion:4,
   projectName:"Eficiencia en la Oficina Técnica",
   currentPhase:"empathize",
   roles:DEFAULT_ROLES,
   topics:TOPICS,
-  contributions:[
-    {id:"c1",phase:"empathize",author:"Equipo",role:"tecnico",topicIds:["t1","t15"],cluster:"Estandarización del diseño",priority:"alta",text:"El diseñador necesita dibujar y detallar con criterios homogéneos, pero parte de la información y de las decisiones se repite manualmente en cada proyecto.",sourceIds:[],createdAt:now-150000},
-    {id:"c2",phase:"empathize",author:"Equipo",role:"tecnico",topicIds:["t1","t2","t8"],cluster:"Gestión de cambios",priority:"alta",text:"Los cambios de diseño obligan a revisar varias partes del proyecto y pueden generar trabajo repetido o incoherencias entre modelo, planos y documentación.",sourceIds:[],createdAt:now-149000},
-    {id:"c3",phase:"empathize",author:"Equipo",role:"tecnico",topicIds:["t2","t7"],cluster:"Reutilización",priority:"alta",text:"Encontrar un diseño anterior útil depende demasiado de saber dónde está guardado y cómo fue nombrado.",sourceIds:[],createdAt:now-148000},
-    {id:"c4",phase:"empathize",author:"Equipo",role:"tecnico",topicIds:["t2","t8","t15"],cluster:"Control documental",priority:"alta",text:"La documentación, versiones y planos requieren controles que hoy consumen tiempo y permiten errores evitables.",sourceIds:[],createdAt:now-147000},
-    {id:"c5",phase:"empathize",author:"Equipo",role:"comercial",topicIds:["t3","t9","t10","t12"],cluster:"Preparación de ofertas",priority:"alta",text:"Para ofertar con rapidez hacen falta datos técnicos, materiales, costes y tiempos que están repartidos entre personas, diseños y experiencias anteriores.",sourceIds:[],createdAt:now-146000},
-    {id:"c6",phase:"empathize",author:"Equipo",role:"comercial",topicIds:["t5","t6","t3"],cluster:"Definición inicial",priority:"alta",text:"Cuando el alcance no queda suficientemente definido al inicio aparecen cambios, interpretaciones distintas y trabajo que no estaba previsto.",sourceIds:[],createdAt:now-145000},
-    {id:"c7",phase:"empathize",author:"Equipo",role:"direccion",topicIds:["t6","t5","t4"],cluster:"Flujo de información",priority:"media",text:"La información del cliente y del proyecto pasa por varias personas y canales, por lo que parte del contexto puede perderse o llegar tarde.",sourceIds:[],createdAt:now-144000},
-    {id:"c8",phase:"empathize",author:"Equipo",role:"tecnico",topicIds:["t4","t6"],cluster:"Priorización",priority:"media",text:"La asignación de trabajo y las prioridades cambian durante el proyecto y no siempre es evidente qué debe hacer cada persona a continuación.",sourceIds:[],createdAt:now-143000},
-    {id:"c9",phase:"empathize",author:"Equipo",role:"tecnico",topicIds:["t7","t2","t1"],cluster:"Reutilización",priority:"alta",text:"Existe conocimiento útil en proyectos anteriores, pero localizar la solución adecuada y entender por qué se tomó una decisión requiere experiencia personal.",sourceIds:[],createdAt:now-142000},
-    {id:"c10",phase:"empathize",author:"Equipo",role:"tecnico",topicIds:["t8","t1","t15"],cluster:"Validación técnica",priority:"alta",text:"Errores de detalle, interferencias o datos incompletos pueden detectarse tarde porque muchas comprobaciones dependen de una revisión manual.",sourceIds:[],createdAt:now-141000},
-    {id:"c11",phase:"empathize",author:"Equipo",role:"tecnico",topicIds:["t9","t10","t11","t12"],cluster:"Estimación de pieza",priority:"alta",text:"El precio de una pieza puede variar mucho y su estimación necesita combinar geometría, material, proceso y tiempos.",sourceIds:[],createdAt:now-140000},
-    {id:"c12",phase:"empathize",author:"Equipo",role:"tecnico",topicIds:["t10","t9","t1"],cluster:"Selección técnica",priority:"media",text:"La selección de material necesita propiedades, alternativas y datos de coste que deberían estar disponibles durante la decisión de diseño.",sourceIds:[],createdAt:now-139000},
-    {id:"c13",phase:"empathize",author:"Equipo",role:"tecnico",topicIds:["t11","t14","t9","t12"],cluster:"Estimación de pieza",priority:"alta",text:"Para estimar una pieza hay que proponer cómo se fabricará: operaciones, máquina, montaje e instalación condicionan coste y plazo.",sourceIds:[],createdAt:now-138000},
-    {id:"c14",phase:"empathize",author:"Equipo",role:"tecnico",topicIds:["t12","t9","t11","t7"],cluster:"Datos históricos",priority:"alta",text:"Los tiempos de mecanizado, montaje y dedicación se estiman con experiencia, pero no siempre se reutilizan de forma sistemática los datos históricos.",sourceIds:[],createdAt:now-137000},
-    {id:"c15",phase:"empathize",author:"Equipo",role:"tecnico",topicIds:["t13","t11","t14","t1"],cluster:"Fabricabilidad",priority:"media",text:"Definir tolerancias y ajustes exige criterio técnico y coherencia con la función, el proceso y la capacidad real de fabricación.",sourceIds:[],createdAt:now-136000},
-    {id:"c16",phase:"empathize",author:"Equipo",role:"tecnico",topicIds:["t14","t11","t12","t9"],cluster:"Fabricabilidad",priority:"media",text:"La decisión de fabricación depende de capacidades y datos de las máquinas, pero esa información no siempre está integrada en el flujo de diseño.",sourceIds:[],createdAt:now-135000},
-    {id:"c17",phase:"empathize",author:"Equipo",role:"tecnico",topicIds:["t15","t1","t2","t8"],cluster:"Automatización",priority:"alta",text:"Muchas tareas repetitivas de ingeniería podrían convertirse en reglas o asistentes, reservando el criterio humano para las decisiones que realmente lo necesitan.",sourceIds:[],createdAt:now-134000}
-  ]
+  contributions:MIRO_CONTRIBUTIONS
 };
 
-const STORAGE_KEY="design-thinking-v3";
-const OLD_KEYS=["bk-design-thinking-v1","design-thinking-v2"];
+const STORAGE_KEY="design-thinking-v4";
+const OLD_KEYS=["design-thinking-v3","design-thinking-v2","bk-design-thinking-v1"];
 let state=loadState();
 let currentView="cards";
 let selectedSources=new Set();
@@ -74,6 +173,16 @@ const topicById=id=>state.topics.find(t=>t.id===id);
 const topicName=id=>topicById(id)?.name||id;
 
 function clone(o){return JSON.parse(JSON.stringify(o));}
+
+function mergeById(existing, base){
+  const out=[...(existing||[])];
+  const seen=new Set(out.map(x=>x.id));
+  for(const item of base){
+    if(!seen.has(item.id)){ out.push(clone(item)); seen.add(item.id); }
+  }
+  return out;
+}
+
 function loadState(){
   try{
     const current=localStorage.getItem(STORAGE_KEY);
@@ -85,20 +194,33 @@ function loadState(){
   }catch(e){}
   return clone(DEMO);
 }
+
 function migrate(data){
-  const s={...clone(DEMO),...data,schemaVersion:3};
-  s.topics=Array.isArray(data.topics)&&data.topics.length?data.topics:clone(TOPICS);
-  s.roles=Array.isArray(data.roles)&&data.roles.length?data.roles:clone(DEFAULT_ROLES);
-  s.contributions=(data.contributions||[]).map(c=>{
+  // V4 ALWAYS merges the current catalogue and Miro seed data.
+  // User-created content is preserved; missing V4 data is injected.
+  const s={
+    schemaVersion:4,
+    projectName:data.projectName||DEMO.projectName,
+    currentPhase:data.currentPhase||"empathize",
+    roles:Array.isArray(data.roles)&&data.roles.length?data.roles:clone(DEFAULT_ROLES),
+    topics:mergeById(Array.isArray(data.topics)?data.topics:[], TOPICS),
+    contributions:[]
+  };
+
+  const migrated=(data.contributions||[]).map(c=>{
     let topicIds=Array.isArray(c.topicIds)?c.topicIds.filter(Boolean):[];
+    // Old V1/V2 records used cluster as if it were a topic.
     if(!topicIds.length && c.cluster){
-      const match=s.topics.find(t=>t.name===c.cluster);
+      const match=s.topics.find(t=>t.name.toLowerCase()===String(c.cluster).toLowerCase());
       if(match) topicIds=[match.id];
     }
     return {...c,topicIds,cluster:c.group||c.cluster||""};
   });
+
+  s.contributions=mergeById(migrated, MIRO_CONTRIBUTIONS);
   return s;
 }
+
 function saveState(){localStorage.setItem(STORAGE_KEY,JSON.stringify(state));}
 
 function render(){
@@ -188,8 +310,9 @@ function topicListText(c){return (c.topicIds||[]).length?(c.topicIds||[]).map(to
 function cardHtml(c){
   const topics=(c.topicIds||[]).map(id=>`<span class="topic-tag">${escapeHtml(topicName(id))}</span>`).join("");
   const cluster=c.cluster?`<span class="cluster-badge">${escapeHtml(c.cluster)}</span>`:"";
+  const origin=c.origin==="miro"?`<span class="origin-badge">MIRO</span>`:"";
   const src=c.sourceIds?.length?`<div class="card-source">↳ Parte de ${c.sourceIds.length} aportación${c.sourceIds.length>1?"es":""} anterior${c.sourceIds.length>1?"es":""}</div>`:"";
-  return `<article class="card"><div class="card-top">${cluster}<span class="priority ${c.priority}"></span></div>${topics?`<div class="topic-tags">${topics}</div>`:""}<div class="card-text">${escapeHtml(c.text)}</div>${src}<div class="card-meta"><span>${escapeHtml(c.author)} · ${escapeHtml(roleName(c.role))}</span><span>${new Date(c.createdAt).toLocaleDateString("es-ES")}</span></div></article>`;
+  return `<article class="card"><div class="card-top"><div>${cluster}${origin}</div><span class="priority ${c.priority}"></span></div>${topics?`<div class="topic-tags">${topics}</div>`:""}<div class="card-text">${escapeHtml(c.text)}</div>${src}<div class="card-meta"><span>${escapeHtml(c.author)} · ${escapeHtml(roleName(c.role))}</span><span>${new Date(c.createdAt).toLocaleDateString("es-ES")}</span></div></article>`;
 }
 function escapeHtml(s=""){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));}
 

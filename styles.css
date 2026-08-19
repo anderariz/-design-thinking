@@ -67,3 +67,12 @@ dialog{border:0;padding:0;background:transparent;color:var(--text);width:min(920
 @media(max-width:560px){
   .panel{padding:15px}.phase-header h1{font-size:28px}.filters,.inline-fields,.form-row{grid-template-columns:1fr}.filters #searchInput{grid-column:auto}.board{grid-template-columns:1fr}.top-actions .ghost{display:none}.view-toggle{display:none}
 }
+
+.origin-badge{
+  display:inline-block;margin-left:5px;font-size:9px;font-weight:800;letter-spacing:.08em;
+  padding:4px 6px;border-radius:6px;border:1px solid #59513a;background:#252116;color:#e9ca69;
+}
+.topic-picker:before{
+  content:"Selecciona todos los que correspondan. Una aportación puede pertenecer a varios dominios.";
+  flex-basis:100%;font-size:11px;color:#6f7a86;margin-bottom:3px;
+}
