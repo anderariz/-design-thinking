@@ -160,3 +160,15 @@ dialog{border:0;padding:0;background:transparent;color:var(--text);width:min(920
   border:1px dashed #29313a;
   border-radius:10px;
 }
+
+.topic-pick-row{display:inline-flex;align-items:center;gap:3px;padding:3px;border:1px solid #29333d;border-radius:12px;background:#11171d}
+.topic-pick-row .topic-chip{margin:0;border:0;background:transparent}
+.topic-pick-row.selected{border-color:#28729b;background:#102535}
+.topic-edit-btn{border:0;border-left:1px solid #2d3944;background:transparent;color:#70c8ff;padding:7px 8px;font-size:10px;font-weight:800}
+.modal{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:18px}.modal.hidden{display:none}
+.modal-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px)}
+.modal-panel{position:relative;z-index:1;width:min(520px,100%);max-height:90vh;overflow:auto;background:#11171d;border:1px solid #2b3640;border-radius:18px;padding:20px;box-shadow:0 24px 80px rgba(0,0,0,.55)}
+.modal-head{display:flex;justify-content:space-between;align-items:flex-start}.modal-head h2{margin:4px 0 12px}.modal-close{width:36px;height:36px;border:1px solid #34404b;border-radius:9px;background:#171e25;color:#c2cad2;font-size:22px}
+.editor-label{display:block;margin:13px 0;color:#aeb8c2;font-size:12px;font-weight:700}.editor-label input,.editor-label textarea{width:100%;margin-top:7px}
+.topic-editor-info{color:#7e8a96;font-size:11px;margin:12px 0}.modal-actions{display:flex;justify-content:space-between;gap:10px;margin-top:18px}
+.danger-btn,.secondary-btn,.primary-btn{border-radius:9px;padding:10px 12px;font-weight:800}.danger-btn{border:1px solid #65363b;background:#28191c;color:#ff929a}.secondary-btn{border:1px solid #34404b;background:#171e25;color:#c4ccd4}.primary-btn{border:1px solid #168bd0;background:#078ff0;color:#fff}

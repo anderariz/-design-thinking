@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <meta name="theme-color" content="#0b0d10" />
-  <title>Design Thinking · V6</title>
+  <title>Design Thinking · V7</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -187,5 +187,17 @@
 </dialog>
 
 <script src="app.js"></script>
+
+<div id="topicEditorModal" class="modal hidden">
+  <div class="modal-backdrop" data-close-topic-editor></div>
+  <div class="modal-panel">
+    <div class="modal-head"><div><small>TEMA / DOMINIO</small><h2>Editar tema</h2></div><button class="modal-close" data-close-topic-editor>×</button></div>
+    <input type="hidden" id="editTopicId">
+    <label class="editor-label">Nombre<input id="editTopicName" type="text"></label>
+    <label class="editor-label">Descripción<textarea id="editTopicDescription" rows="4"></textarea></label>
+    <div id="topicEditorInfo" class="topic-editor-info"></div>
+    <div class="modal-actions"><button id="deleteTopicBtn" class="danger-btn">Eliminar tema</button><div><button class="secondary-btn" data-close-topic-editor>Cancelar</button> <button id="saveTopicBtn" class="primary-btn">Guardar cambios</button></div></div>
+  </div>
+</div>
 </body>
 </html>

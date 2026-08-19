@@ -151,7 +151,7 @@ const MIRO_CONTRIBUTIONS = [
 }));
 
 const DEMO = {
-  schemaVersion:6,
+  schemaVersion:7,
   projectName:"Eficiencia en la Oficina Técnica",
   currentPhase:"empathize",
   roles:DEFAULT_ROLES,
@@ -159,8 +159,8 @@ const DEMO = {
   contributions:MIRO_CONTRIBUTIONS
 };
 
-const STORAGE_KEY="design-thinking-v6";
-const OLD_KEYS=["design-thinking-v5","design-thinking-v4","design-thinking-v3","design-thinking-v2","bk-design-thinking-v1"];
+const STORAGE_KEY="design-thinking-v7";
+const OLD_KEYS=["design-thinking-v6","design-thinking-v5","design-thinking-v4","design-thinking-v3","design-thinking-v2","bk-design-thinking-v1"];
 let state=loadState();
 let currentView="cards";
 let selectedSources=new Set();
@@ -200,7 +200,7 @@ function migrate(data){
   // V4 ALWAYS merges the current catalogue and Miro seed data.
   // User-created content is preserved; missing V4 data is injected.
   const s={
-    schemaVersion:6,
+    schemaVersion:7,
     projectName:data.projectName||DEMO.projectName,
     currentPhase:data.currentPhase||"empathize",
     roles:Array.isArray(data.roles)&&data.roles.length?data.roles:clone(DEFAULT_ROLES),
@@ -350,8 +350,42 @@ function goToContribution(id){
 }
 
 function renderTopicPicker(){
-  $("#topicPicker").innerHTML=state.topics.map(t=>`<button type="button" class="topic-option ${selectedTopics.has(t.id)?"selected":""}" data-topic-pick="${t.id}"><span class="check">✓</span>${escapeHtml(t.name)}</button>`).join("");
-  document.querySelectorAll("[data-topic-pick]").forEach(b=>b.onclick=()=>{selectedTopics.has(b.dataset.topicPick)?selectedTopics.delete(b.dataset.topicPick):selectedTopics.add(b.dataset.topicPick);renderTopicPicker();});
+  const el=$("#topicPicker");
+  el.innerHTML=state.topics.map(t=>`
+    <div class="topic-pick-row ${selectedTopics.has(t.id)?"selected":""}">
+      <button type="button" class="topic-chip ${selectedTopics.has(t.id)?"selected":""}" data-topic="${t.id}" title="${escapeHtml(t.description||"")}">${escapeHtml(t.name)}</button>
+      <button type="button" class="topic-edit-btn" data-edit-topic="${t.id}">Ver</button>
+    </div>`).join("");
+  document.querySelectorAll("[data-topic]").forEach(b=>b.onclick=()=>{
+    const id=b.dataset.topic;
+    selectedTopics.has(id)?selectedTopics.delete(id):selectedTopics.add(id);
+    renderTopicPicker();
+  });
+  document.querySelectorAll("[data-edit-topic]").forEach(b=>b.onclick=e=>{
+    e.stopPropagation();openTopicEditor(b.dataset.editTopic);
+  });
+}
+function openTopicEditor(id){
+  const t=state.topics.find(x=>x.id===id); if(!t)return;
+  $("#editTopicId").value=id; $("#editTopicName").value=t.name||"";
+  $("#editTopicDescription").value=t.description||"";
+  const n=state.contributions.filter(c=>(c.topicIds||[]).includes(id)).length;
+  $("#topicEditorInfo").textContent=`Relacionado con ${n} aportación${n===1?"":"es"}.`;
+  $("#topicEditorModal").classList.remove("hidden");
+}
+function closeTopicEditor(){$("#topicEditorModal").classList.add("hidden");}
+function saveTopicEdits(){
+  const t=state.topics.find(x=>x.id===$("#editTopicId").value); if(!t)return;
+  const name=$("#editTopicName").value.trim(); if(!name)return $("#editTopicName").focus();
+  t.name=name;t.description=$("#editTopicDescription").value.trim();saveState();closeTopicEditor();render();
+}
+function deleteTopic(){
+  const id=$("#editTopicId").value,t=state.topics.find(x=>x.id===id);if(!t)return;
+  const n=state.contributions.filter(c=>(c.topicIds||[]).includes(id)).length;
+  if(!confirm(n?`“${t.name}” está usado en ${n} aportaciones. Se quitará de ellas. ¿Continuar?`:`¿Eliminar “${t.name}”?`))return;
+  state.topics=state.topics.filter(x=>x.id!==id);
+  state.contributions.forEach(c=>c.topicIds=(c.topicIds||[]).filter(x=>x!==id));
+  selectedTopics.delete(id);saveState();closeTopicEditor();render();
 }
 function renderFilters(){
   const ft=$("#filterTopic"),old=ft.value;
@@ -446,4 +480,8 @@ if($("#clearSourceSearchBtn")){
   };
 }
 
+if($("#saveTopicBtn"))$("#saveTopicBtn").onclick=saveTopicEdits;
+if($("#deleteTopicBtn"))$("#deleteTopicBtn").onclick=deleteTopic;
+document.querySelectorAll("[data-close-topic-editor]").forEach(x=>x.onclick=closeTopicEditor);
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("#topicEditorModal").classList.contains("hidden"))closeTopicEditor();});
 render();
