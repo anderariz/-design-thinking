@@ -1,31 +1,39 @@
-# BerriKide Design Thinking · V1
+# Design Thinking · V3
 
-Prototipo web autónomo para sesiones de Design Thinking.
+Versión 3 del prototipo web.
 
-## Qué incluye
-- 5 fases: Empatizar, Definir, Idear, Prototipar y Probar.
-- Roles configurables por fase.
-- Formato de frase recomendado en cada fase.
-- Registro de autor, rol, prioridad y grupo temático.
-- Recuperación de aportaciones de fases anteriores.
-- Trazabilidad entre aportaciones (`sourceIds`).
-- Vista por tarjetas o agrupada por temas.
-- Persistencia local mediante `localStorage`.
-- Exportación del proyecto a JSON.
-- Interfaz responsive para móvil y escritorio.
+## Cambio principal
+Las aportaciones ya no pertenecen a un único tema. Cada aportación puede tener **varios temas simultáneamente**.
 
-## Ejecutar
-Abre `index.html` en un navegador moderno.
+Ejemplo:
+- PDM / Documentación
+- CAD / Diseño
+- Ofertas
+- Revisión y calidad
 
-Para desarrollo local también puedes usar:
-`python -m http.server 8000`
+Todos esos temas pueden apuntar a la misma aportación, sin duplicarla.
 
-y abrir `http://localhost:8000`.
+## Tema vs grupo
+En V3 se separan dos conceptos:
 
-## Próximos pasos recomendados
-1. Multiusuario real con login.
-2. Backend (Supabase/Firebase/PostgreSQL).
-3. Sesiones/proyectos y permisos.
-4. Votación y priorización.
-5. IA para sugerir agrupaciones, detectar duplicados y transformar aportaciones entre fases.
-6. Historial/versionado y exportación de informe.
+- **Temas**: etiquetas múltiples que describen qué áreas toca una aportación.
+- **Grupo / cluster**: agrupación conceptual que reúne aportaciones relacionadas durante el análisis.
+
+Una aportación puede tener 4 temas y pertenecer a un único cluster como “Gestión de cambios”.
+
+## Nuevas funciones
+- Selector multitema con chips.
+- Filtro por tema.
+- Vista “Temas”: una misma aportación aparece bajo cada tema asociado, manteniendo un único registro.
+- Vista “Grupos”.
+- Aportaciones iniciales actualizadas con relaciones transversales.
+- Migración automática de datos de versiones anteriores almacenados en `localStorage`.
+- Eliminadas las referencias visibles a BerriKide.
+- Exportación JSON con el nuevo esquema `topicIds`.
+
+## Archivos
+- `index.html`
+- `styles.css`
+- `app.js`
+
+Para GitHub Pages sustituye los tres archivos anteriores por estos.
